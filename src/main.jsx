@@ -29,9 +29,9 @@ import "./assets/css/cart.css";
 import App from "./App.jsx";
 
 // En desarrollo local se usa la raíz "/".
-// En producción se utiliza "/react_07_React_Router_II"
+// En producción se utiliza "/react_08_JWT"
 const routerBasename = import.meta.env.PROD
-    ? "/react_07_React_Router_II"
+    ? "/react_08_JWT"
     : "/";
 
 ReactDOM.createRoot(document.getElementById("root")).render(

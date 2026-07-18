@@ -1,19 +1,45 @@
 // Profile.jsx
 // Página privada del usuario.
 //
-// La ruta está protegida desde App.jsx.
-// El botón utiliza el mismo logout disponible en Navbar.
+// Al montar el componente consulta GET /api/auth/me
+// enviando el JWT en Authorization.
+//
+// Muestra el email real almacenado en UserContext
+// y permite cerrar la sesión.
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { useUser } from "../context/UserContext.jsx";
 
 const Profile = () => {
-    // Email estático conservado desde el Hito 5.
-    const emailUsuario = "prueba@prueba.com";
+    const {
+        email,
+        obtenerPerfil,
+        logout,
+        cargandoUsuario,
+    } = useUser();
 
-    // Método global de cierre de sesión.
-    const { logout } = useUser();
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const cargarPerfil = async () => {
+            try {
+                setError("");
+
+                // Consume GET /api/auth/me.
+                await obtenerPerfil();
+            } catch (errorPerfil) {
+                setError(
+                    errorPerfil.message ||
+                    "No fue posible cargar el perfil."
+                );
+            }
+        };
+
+        cargarPerfil();
+
+        // La carga se realiza una vez al montar Profile.
+    }, []);
 
     return (
         <main className="form-page">
@@ -22,14 +48,26 @@ const Profile = () => {
                     Perfil de usuario
                 </h1>
 
-                <p>
-                    <strong>Email:</strong> {emailUsuario}
-                </p>
+                {cargandoUsuario && (
+                    <p>Cargando perfil...</p>
+                )}
 
-                {/*
-                    Al cambiar token a false, ProtectedRoute detectará
-                    el cambio y redirigirá automáticamente a /login.
-                */}
+                {error !== "" && (
+                    <div
+                        className="alert alert-danger"
+                        role="alert"
+                    >
+                        {error}
+                    </div>
+                )}
+
+                {email !== "" && (
+                    <p>
+                        <strong>Email:</strong>{" "}
+                        {email}
+                    </p>
+                )}
+
                 <button
                     type="button"
                     className="btn btn-dark"

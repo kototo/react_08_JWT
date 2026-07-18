@@ -1,29 +1,22 @@
 // Cart.jsx
-// Página/componente del carrito.
+// Página y componente flotante del carrito.
 //
-// El carrito se administra globalmente mediante Cart Context.
-// En el Hito 7 también consume User Context para conocer
-// el estado simulado de autenticación del usuario.
-//
-// Visualmente se mantiene como tarjeta reutilizable:
-// 1. Puede mostrarse en la ruta /cart.
-// 2. Puede mostrarse dentro del carrito flotante.
-// 3. El comensal puede cerrarlo y continuar agregando productos.
+// En el Hito 8:
+// 1. Mantiene el carrito global mediante CartContext.
+// 2. Consume el JWT desde UserContext.
+// 3. Envía el carrito al backend mediante POST /api/checkouts.
+// 4. Muestra mensajes de éxito o error.
+// 5. Continúa funcionando como carrito flotante y como ruta /cart.
 
-import React from "react";
+import React, { useState } from "react";
 
-// Función utilizada para mostrar los precios con separador de miles.
 import { formatoMoneda } from "../utils/formatoMoneda.js";
+import { API_ENDPOINTS } from "../config/api.js";
 
-// Context global del carrito.
 import { useCart } from "../context/CartContext.jsx";
-
-// Context global del usuario.
-// Se utiliza para consultar el token simulado.
 import { useUser } from "../context/UserContext.jsx";
 
 const Cart = () => {
-    // Consumimos el estado global y las funciones del carrito.
     const {
         carrito,
         totalCarrito,
@@ -33,19 +26,107 @@ const Cart = () => {
         limpiarCarrito,
     } = useCart();
 
-    // Consumimos el token desde UserContext.
-    //
-    // Cuando token es true:
-    // el usuario puede presionar el botón Pagar.
-    //
-    // Cuando token es false:
-    // el botón Pagar queda deshabilitado.
-    const { token } = useUser();
+    // Token real del usuario autenticado.
+    const {
+        token,
+        logout,
+    } = useUser();
 
-    // Función auxiliar para mostrar el nombre
-    // de la pizza
+    // Estados propios de la operación de checkout.
+    const [procesandoCompra, setProcesandoCompra] =
+        useState(false);
+
+    const [mensajeCompra, setMensajeCompra] =
+        useState("");
+
+    const [errorCompra, setErrorCompra] =
+        useState("");
+
     const capitalizarNombre = (nombre) => {
-        return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+        return nombre.charAt(0).toUpperCase() +
+            nombre.slice(1);
+    };
+
+    // Envía el carrito al backend.
+    const realizarCompra = async () => {
+        setMensajeCompra("");
+        setErrorCompra("");
+
+        if (!token) {
+            setErrorCompra(
+                "Debes iniciar sesión para realizar el pago."
+            );
+
+            return;
+        }
+
+        if (carrito.length === 0) {
+            setErrorCompra(
+                "No puedes pagar un carrito vacío."
+            );
+
+            return;
+        }
+
+        setProcesandoCompra(true);
+
+        try {
+            const respuesta = await fetch(
+                API_ENDPOINTS.checkouts,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+
+                        // El JWT se envía según el estándar Bearer.
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        cart: carrito,
+                    }),
+                }
+            );
+
+            const data = await respuesta
+                .json()
+                .catch(() => ({}));
+
+            // Si el JWT expiró o no es válido,
+            // eliminamos la sesión local.
+            if (respuesta.status === 401) {
+                logout();
+
+                throw new Error(
+                    "La sesión expiró. Debes iniciar sesión nuevamente."
+                );
+            }
+
+            if (!respuesta.ok) {
+                throw new Error(
+                    data?.error ||
+                    data?.message ||
+                    "No fue posible realizar la compra."
+                );
+            }
+
+            // Mensaje requerido por el Hito 8.
+            setMensajeCompra(
+                data?.message ||
+                data?.mensaje ||
+                "Compra realizada correctamente."
+            );
+
+            // Después de una compra exitosa,
+            // vaciamos el carrito global.
+            limpiarCarrito();
+        } catch (error) {
+            setErrorCompra(
+                error.message ||
+                "Ocurrió un error al procesar la compra."
+            );
+        } finally {
+            setProcesandoCompra(false);
+        }
     };
 
     return (
@@ -55,38 +136,41 @@ const Cart = () => {
                     Detalles del pedido:
                 </h2>
 
-                {/*
-                    Decisión de diseño:
+                {/* El mensaje queda visible aunque el carrito se vacíe */}
+                {mensajeCompra !== "" && (
+                    <div
+                        className="alert alert-success"
+                        role="alert"
+                    >
+                        {mensajeCompra}
+                    </div>
+                )}
 
-                    El carrito se mantiene como tarjeta flotante o tarjeta central.
+                {errorCompra !== "" && (
+                    <div
+                        className="alert alert-danger"
+                        role="alert"
+                    >
+                        {errorCompra}
+                    </div>
+                )}
 
-                    No se separa visualmente en una hoja independiente porque
-                    esto permite que el comensal revise su pedido, cierre el
-                    carrito y continúe agregando productos desde Home o desde
-                    la página de detalle de una pizza.
-                */}
-
-                {/* Si no existen productos, mostramos un mensaje informativo */}
                 {carrito.length === 0 ? (
                     <div className="text-center">
                         <p>El carrito está vacío.</p>
 
                         <p className="text-muted">
-                            Agrega una pizza desde el Home para comenzar tu pedido.
+                            Agrega una pizza desde el Home
+                            para comenzar tu pedido.
                         </p>
                     </div>
                 ) : (
                     <>
-                        {/*
-                            Recorremos todos los productos almacenados
-                            en el Cart Context.
-                        */}
                         {carrito.map((pizza) => (
                             <div
                                 className="cart-item"
                                 key={pizza.id}
                             >
-                                {/* Imagen y nombre de la pizza */}
                                 <div className="cart-product">
                                     <img
                                         src={pizza.img}
@@ -95,59 +179,55 @@ const Cart = () => {
                                     />
 
                                     <span className="cart-name">
-                                        {capitalizarNombre(pizza.name)}
+                                        {capitalizarNombre(
+                                            pizza.name
+                                        )}
                                     </span>
                                 </div>
 
-                                {/* Precio unitario de la pizza */}
                                 <span className="cart-price">
-                                    ${formatoMoneda(pizza.price)}
+                                    ${formatoMoneda(
+                                    pizza.price
+                                )}
                                 </span>
 
-                                {/* Controles para modificar el carrito */}
                                 <div className="cart-actions">
-                                    {/*
-                                        Disminuye la cantidad.
-
-                                        Si la cantidad llega a cero,
-                                        CartContext elimina el producto.
-                                    */}
                                     <button
                                         type="button"
                                         className="btn btn-outline-danger btn-sm cart-btn"
                                         onClick={() =>
-                                            disminuirCantidad(pizza.id)
+                                            disminuirCantidad(
+                                                pizza.id
+                                            )
                                         }
-                                        aria-label={`Disminuir cantidad de ${pizza.name}`}
                                     >
                                         -
                                     </button>
 
-                                    {/* Cantidad actual del producto */}
                                     <span className="cart-count">
                                         {pizza.count}
                                     </span>
 
-                                    {/* Aumenta la cantidad */}
                                     <button
                                         type="button"
                                         className="btn btn-outline-primary btn-sm cart-btn"
                                         onClick={() =>
-                                            aumentarCantidad(pizza.id)
+                                            aumentarCantidad(
+                                                pizza.id
+                                            )
                                         }
-                                        aria-label={`Aumentar cantidad de ${pizza.name}`}
                                     >
                                         +
                                     </button>
 
-                                    {/* Elimina completamente el producto */}
                                     <button
                                         type="button"
                                         className="btn btn-outline-secondary btn-sm cart-btn"
                                         onClick={() =>
-                                            eliminarDelCarrito(pizza.id)
+                                            eliminarDelCarrito(
+                                                pizza.id
+                                            )
                                         }
-                                        aria-label={`Eliminar ${pizza.name} del carrito`}
                                         title="Eliminar producto"
                                     >
                                         <i className="fa-solid fa-trash"></i>
@@ -156,50 +236,39 @@ const Cart = () => {
                             </div>
                         ))}
 
-                        {/*
-                            El total proviene directamente de CartContext.
-
-                            Por esta razón debe mostrar exactamente el mismo
-                            valor que aparece en el Navbar.
-                        */}
                         <h2 className="cart-total">
                             Total: ${formatoMoneda(totalCarrito)}
                         </h2>
 
                         <div className="d-flex gap-2 justify-content-center flex-wrap">
-                            {/*
-                                Requerimiento del Hito 7:
-
-                                El botón Pagar queda deshabilitado
-                                cuando el token es false.
-                            */}
                             <button
                                 type="button"
                                 className="btn btn-dark"
-                                disabled={!token}
-                                title={
-                                    token
-                                        ? "Continuar con el pago"
-                                        : "Debes iniciar sesión para pagar"
+                                onClick={realizarCompra}
+                                disabled={
+                                    !token ||
+                                    procesandoCompra ||
+                                    carrito.length === 0
                                 }
                             >
-                                Pagar
+                                {procesandoCompra
+                                    ? "Procesando..."
+                                    : "Pagar"}
                             </button>
 
-                            {/* Elimina todos los productos del carrito */}
                             <button
                                 type="button"
                                 className="btn btn-outline-danger"
-                                onClick={limpiarCarrito}
+                                onClick={() => {
+                                    setMensajeCompra("");
+                                    setErrorCompra("");
+                                    limpiarCarrito();
+                                }}
                             >
                                 Vaciar carrito
                             </button>
                         </div>
 
-                        {/*
-                            Mensaje adicional cuando el usuario
-                            no tiene una sesión activa.
-                        */}
                         {!token && (
                             <p className="text-danger text-center mt-3 mb-0">
                                 Debes iniciar sesión para realizar el pago.

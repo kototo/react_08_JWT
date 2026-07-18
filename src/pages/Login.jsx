@@ -1,76 +1,75 @@
 // Login.jsx
 // Página de inicio de sesión.
 //
-// Valida credenciales simuladas y, cuando son correctas,
-// ejecuta el método login del UserContext.
-
+// En el Hito 8 ya no se comparan credenciales localmente.
+// El formulario consume el método login de UserContext,
+// que realiza una petición real al backend.
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Context global del usuario.
 import { useUser } from "../context/UserContext.jsx";
 
 const Login = () => {
-    // Credenciales simuladas utilizadas para este ejercicio.
-    const usuarioPrueba = "prueba@prueba.com";
-    const contraseñaPrueba = "prueba1234";
-
     // Estados controlados del formulario.
     const [email, setEmail] = useState("");
-    const [contraseña, setContraseña] = useState("");
+    const [password, setPassword] = useState("");
 
-    // Mensajes de validación.
+    // Mensaje de error que puede venir desde validaciones
+    // locales o desde el backend.
     const [error, setError] = useState("");
-    const [mensaje, setMensaje] = useState("");
 
-    // Método global para cambiar token a true.
-    const { login } = useUser();
+    // Método real de autenticación y estado de carga.
+    const {
+        login,
+        cargandoUsuario,
+    } = useUser();
 
-    // Permite navegar al Home después del login.
+    // Permite redirigir al Home cuando el login es correcto.
     const navigate = useNavigate();
 
-    // Procesa el formulario.
-    const manejarSubmit = (evento) => {
-        // Evita que el formulario recargue el navegador.
+    const manejarSubmit = async (evento) => {
         evento.preventDefault();
 
-        // Limpiamos los mensajes anteriores.
+        // Limpiamos errores anteriores.
         setError("");
-        setMensaje("");
 
         // Validación de campos obligatorios.
-        if (email.trim() === "" || contraseña.trim() === "") {
-            setError("Todos los campos son obligatorios.");
+        if (
+            email.trim() === "" ||
+            password.trim() === ""
+        ) {
+            setError(
+                "Todos los campos son obligatorios."
+            );
+
             return;
         }
 
-        // Validación de extensión mínima.
-        if (contraseña.length < 6) {
+        // Validación mínima solicitada desde hitos anteriores.
+        if (password.length < 6) {
             setError(
                 "La contraseña debe tener al menos 6 caracteres."
             );
+
             return;
         }
 
-        // Validación de credenciales simuladas.
-        if (
-            email !== usuarioPrueba ||
-            contraseña !== contraseñaPrueba
-        ) {
-            setError("Email o contraseña incorrectos.");
-            return;
+        try {
+            // El método login consume POST /api/auth/login.
+            await login(email, password);
+
+            // Cuando UserContext guarda el JWT,
+            // redirigimos al Home.
+            navigate("/", {
+                replace: true,
+            });
+        } catch (errorLogin) {
+            setError(
+                errorLogin.message ||
+                "No fue posible iniciar sesión."
+            );
         }
-
-        // Cambia el token global a true.
-        // Esto actualiza inmediatamente el Navbar.
-        login();
-
-        // Mensaje de confirmación.
-        setMensaje("Inicio de sesión correcto.");
-
-        // Redirige al Home.
-        navigate("/");
     };
 
     return (
@@ -81,7 +80,6 @@ const Login = () => {
                 </h1>
 
                 <form onSubmit={manejarSubmit}>
-                    {/* Campo email */}
                     <div className="mb-3">
                         <label
                             htmlFor="login-email"
@@ -98,11 +96,11 @@ const Login = () => {
                             onChange={(evento) =>
                                 setEmail(evento.target.value)
                             }
-                            placeholder="prueba@prueba.com"
+                            placeholder="test@test.com"
+                            autoComplete="email"
                         />
                     </div>
 
-                    {/* Campo contraseña */}
                     <div className="mb-3">
                         <label
                             htmlFor="login-password"
@@ -115,15 +113,15 @@ const Login = () => {
                             id="login-password"
                             type="password"
                             className="form-control"
-                            value={contraseña}
+                            value={password}
                             onChange={(evento) =>
-                                setContraseña(evento.target.value)
+                                setPassword(evento.target.value)
                             }
-                            placeholder="prueba1234"
+                            placeholder="123123"
+                            autoComplete="current-password"
                         />
                     </div>
 
-                    {/* Mensaje de error */}
                     {error !== "" && (
                         <div
                             className="alert alert-danger"
@@ -133,21 +131,14 @@ const Login = () => {
                         </div>
                     )}
 
-                    {/* Mensaje de éxito */}
-                    {mensaje !== "" && (
-                        <div
-                            className="alert alert-success"
-                            role="alert"
-                        >
-                            {mensaje}
-                        </div>
-                    )}
-
                     <button
                         type="submit"
                         className="btn btn-dark"
+                        disabled={cargandoUsuario}
                     >
-                        Iniciar sesión
+                        {cargandoUsuario
+                            ? "Ingresando..."
+                            : "Iniciar sesión"}
                     </button>
                 </form>
             </section>

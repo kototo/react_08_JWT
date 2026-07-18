@@ -1,107 +1,177 @@
 // Register.jsx
-// Componente solicitado en el Hito 2.
-// Maneja estado y eventos para validar un formulario de registro.
+// Página de registro.
+//
+// En el Hito 8 el formulario consume el método register
+// de UserContext, que realiza POST /api/auth/register.
+//
+// Si el backend registra correctamente al usuario,
+// devuelve un JWT y el usuario queda autenticado.
 
-// Importamos React y useState para manejar el estado del formulario.
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { useUser } from "../context/UserContext.jsx";
 
 const Register = () => {
     // Estados del formulario.
     const [email, setEmail] = useState("");
-    const [contrasena, setContrasena] = useState("");
-    const [confirmarContrasena, setConfirmarContrasena] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmarPassword, setConfirmarPassword] =
+        useState("");
 
-    // Estados para mostrar mensaje de éxito o error.
-    const [mensaje, setMensaje] = useState("");
-    const [tipoMensaje, setTipoMensaje] = useState("");
+    const [error, setError] = useState("");
 
-    // Función que se ejecuta al enviar el formulario.
-    const manejarEnvio = (evento) => {
-        // Evita que la página se recargue.
+    // Método real de registro.
+    const {
+        register,
+        cargandoUsuario,
+    } = useUser();
+
+    const navigate = useNavigate();
+
+    const manejarSubmit = async (evento) => {
         evento.preventDefault();
 
-        // Validación: campos obligatorios.
+        setError("");
+
+        // Todos los campos son obligatorios.
         if (
             email.trim() === "" ||
-            contrasena.trim() === "" ||
-            confirmarContrasena.trim() === ""
+            password.trim() === "" ||
+            confirmarPassword.trim() === ""
         ) {
-            setMensaje("Todos los campos son obligatorios.");
-            setTipoMensaje("danger");
+            setError(
+                "Todos los campos son obligatorios."
+            );
+
             return;
         }
 
-        // Validación: contraseña mínima de 6 caracteres.
-        if (contrasena.length < 6) {
-            setMensaje("La contraseña debe tener al menos 6 caracteres.");
-            setTipoMensaje("danger");
+        // Validamos la extensión mínima.
+        if (password.length < 6) {
+            setError(
+                "La contraseña debe tener al menos 6 caracteres."
+            );
+
             return;
         }
 
-        // Validación: contraseña y confirmación deben ser iguales.
-        if (contrasena !== confirmarContrasena) {
-            setMensaje("La contraseña y la confirmación no coinciden.");
-            setTipoMensaje("danger");
+        // Ambas contraseñas deben ser iguales.
+        if (password !== confirmarPassword) {
+            setError(
+                "Las contraseñas no coinciden."
+            );
+
             return;
         }
 
-        // Mensaje de éxito. No se guarda información todavía.
-        setMensaje("Registro exitoso.");
-        setTipoMensaje("success");
+        try {
+            // Consume POST /api/auth/register.
+            await register(email, password);
+
+            // El registro también inicia la sesión
+            // porque UserContext almacena el JWT recibido.
+            navigate("/", {
+                replace: true,
+            });
+        } catch (errorRegister) {
+            setError(
+                errorRegister.message ||
+                "No fue posible registrar al usuario."
+            );
+        }
     };
 
     return (
         <main className="form-page">
-            <section className="form-card">
-                <h1 className="form-title">Register</h1>
+            <section className="card form-card p-4">
+                <h1 className="form-title">
+                    Crear cuenta
+                </h1>
 
-                <form onSubmit={manejarEnvio}>
+                <form onSubmit={manejarSubmit}>
                     <div className="mb-3">
-                        <label className="form-label">Email</label>
+                        <label
+                            htmlFor="register-email"
+                            className="form-label"
+                        >
+                            Email
+                        </label>
 
                         <input
+                            id="register-email"
                             type="email"
                             className="form-control"
-                            placeholder="Ingresa tu email"
                             value={email}
-                            onChange={(evento) => setEmail(evento.target.value)}
+                            onChange={(evento) =>
+                                setEmail(evento.target.value)
+                            }
+                            placeholder="usuario@correo.com"
+                            autoComplete="email"
                         />
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Contraseña</label>
+                        <label
+                            htmlFor="register-password"
+                            className="form-label"
+                        >
+                            Contraseña
+                        </label>
 
                         <input
+                            id="register-password"
                             type="password"
                             className="form-control"
-                            placeholder="Ingresa tu contraseña"
-                            value={contrasena}
-                            onChange={(evento) => setContrasena(evento.target.value)}
+                            value={password}
+                            onChange={(evento) =>
+                                setPassword(evento.target.value)
+                            }
+                            autoComplete="new-password"
                         />
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">Confirmar contraseña</label>
+                        <label
+                            htmlFor="register-confirm-password"
+                            className="form-label"
+                        >
+                            Confirmar contraseña
+                        </label>
 
                         <input
+                            id="register-confirm-password"
                             type="password"
                             className="form-control"
-                            placeholder="Confirma tu contraseña"
-                            value={confirmarContrasena}
-                            onChange={(evento) => setConfirmarContrasena(evento.target.value)}
+                            value={confirmarPassword}
+                            onChange={(evento) =>
+                                setConfirmarPassword(
+                                    evento.target.value
+                                )
+                            }
+                            autoComplete="new-password"
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary">
-                        Register
+                    {error !== "" && (
+                        <div
+                            className="alert alert-danger"
+                            role="alert"
+                        >
+                            {error}
+                        </div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="btn btn-dark"
+                        disabled={cargandoUsuario}
+                    >
+                        {cargandoUsuario
+                            ? "Registrando..."
+                            : "Registrarse"}
                     </button>
                 </form>
-
-                {mensaje !== "" && (
-                    <div className={`alert alert-${tipoMensaje} mt-3`} role="alert">
-                        {mensaje}
-                    </div>
-                )}
             </section>
         </main>
     );

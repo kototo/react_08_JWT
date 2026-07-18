@@ -1,10 +1,10 @@
 // Navbar.jsx
-// Menú principal de navegación.
+// Menú principal.
 //
 // Consume:
-// 1. CartContext para mostrar el total real.
-// 2. UserContext para mostrar las opciones según el token.
-// 3. El método logout para cerrar la sesión simulada.
+// 1. CartContext para mostrar el total del carrito.
+// 2. UserContext para conocer si existe un JWT.
+// 3. logout para cerrar la sesión real.
 
 import React from "react";
 import { Link } from "react-router-dom";
@@ -14,13 +14,12 @@ import { useCart } from "../context/CartContext.jsx";
 import { useUser } from "../context/UserContext.jsx";
 
 const Navbar = ({ abrirCarrito }) => {
-    // Información global del carrito.
     const {
         totalCarrito,
         cantidadProductos,
     } = useCart();
 
-    // Información global de autenticación.
+    // token ahora contiene un JWT real o una cadena vacía.
     const {
         token,
         logout,
@@ -35,7 +34,7 @@ const Navbar = ({ abrirCarrito }) => {
             </div>
 
             <div className="navbar-actions">
-                {/* Home siempre debe estar visible */}
+                {/* Home siempre visible */}
                 <Link
                     className="btn btn-outline-light btn-sm"
                     to="/"
@@ -44,13 +43,9 @@ const Navbar = ({ abrirCarrito }) => {
                     Home
                 </Link>
 
-                {/*
-                    Navegación condicional según el token.
-                    React se actualiza automáticamente cuando logout cambia el token.
-                */}
+                {/* Si existe JWT, mostramos Profile y Logout */}
                 {token ? (
                     <>
-                        {/* Usuario autenticado: se muestra Profile */}
                         <Link
                             className="btn btn-outline-light btn-sm"
                             to="/profile"
@@ -59,7 +54,6 @@ const Navbar = ({ abrirCarrito }) => {
                             Profile
                         </Link>
 
-                        {/* Logout ejecuta el método del UserContext */}
                         <button
                             className="btn btn-outline-light btn-sm"
                             type="button"
@@ -71,7 +65,6 @@ const Navbar = ({ abrirCarrito }) => {
                     </>
                 ) : (
                     <>
-                        {/* Usuario sin sesión: se muestra Login */}
                         <Link
                             className="btn btn-outline-light btn-sm"
                             to="/login"
@@ -80,7 +73,6 @@ const Navbar = ({ abrirCarrito }) => {
                             Login
                         </Link>
 
-                        {/* Usuario sin sesión: se muestra Register */}
                         <Link
                             className="btn btn-outline-light btn-sm"
                             to="/register"
@@ -91,7 +83,7 @@ const Navbar = ({ abrirCarrito }) => {
                     </>
                 )}
 
-                {/* Total siempre debe estar visible */}
+                {/* Total siempre visible */}
                 <button
                     className="btn btn-outline-info btn-sm"
                     type="button"
