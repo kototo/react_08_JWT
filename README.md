@@ -1,53 +1,55 @@
-# Hito 7 - Pizzería Mamma Mía
+# Hito 8 - Pizzería Mamma Mía
 
-Proyecto desarrollado con React y Vite para el desafío de aprendizaje **Pizzería Mamma Mía**.
+Proyecto final desarrollado con React y Vite para el desafío de aprendizaje **Pizzería Mamma Mía**.
 
-En este hito se profundiza el uso de **React Router**, incorporando rutas dinámicas con `useParams`, autenticación simulada mediante `UserContext`, navegación condicional y protección de rutas.
+En este hito se implementa autenticación real mediante **JSON Web Token — JWT**, consumiendo los endpoints del backend para iniciar sesión, registrar usuarios, consultar el perfil autenticado y realizar una compra simulada.
 
-El proyecto conserva las funcionalidades desarrolladas en los hitos anteriores:
+El proyecto mantiene las funcionalidades desarrolladas en los hitos anteriores:
 
-- Consumo de la API de pizzas.
+- Consumo de API de pizzas.
+- React Router.
+- Rutas dinámicas mediante `useParams`.
+- Rutas públicas y protegidas.
 - Carrito global mediante Context API.
 - Persistencia del carrito con `localStorage`.
 - Carrito flotante.
-- React Router.
-- Formularios de Login y Register.
+- Navegación condicional en el Navbar.
 
 ## Ver online
 
 La aplicación está publicada en:
 
-[https://desafiolatam.sinapsolabs.cl/react_07_React_Router_II/](https://desafiolatam.sinapsolabs.cl/react_07_React_Router_II/)
+[https://desafiolatam.sinapsolabs.cl/react_08_JWT/](https://desafiolatam.sinapsolabs.cl/react_08_JWT/)
 
-## Objetivo del Hito 7
 
-El objetivo principal es implementar funcionalidades avanzadas de React Router y autenticación simulada.
+## Objetivo 
 
-Se incorporan:
+El objetivo principal es reemplazar la autenticación simulada del Hito 7 por autenticación real contra el backend utilizando JWT.
 
-- Rutas dinámicas para mostrar pizzas según su identificador.
-- Uso de `useParams`.
-- Context global para almacenar el token del usuario.
-- Inicio y cierre de sesión simulados.
-- Navegación condicional en el Navbar.
-- Desactivación del botón Pagar cuando no existe sesión.
-- Protección de la ruta `/profile`.
-- Restricción de Login y Register cuando el usuario ya está autenticado.
+Se implementan las siguientes funcionalidades:
+
+- Login real contra la API.
+- Registro real de usuarios.
+- Almacenamiento de token JWT y email.
+- Persistencia de sesión mediante `localStorage`.
+- Consulta del perfil autenticado.
+- Logout desde Navbar y Profile.
+- Protección de rutas mediante JWT.
+- Checkout autenticado.
+- Mensaje de compra realizada correctamente.
 
 ## Backend utilizado
 
-La aplicación consume la API implementada en el Hito 4:
+La aplicación consume la API publicada en:
 
 ```text
-https://desafiolatam.sinapsolabs.cl/react_04_backend/api/
+https://desafiolatam.sinapsolabs.cl/react_04_backend/api
 ```
 
-Listado completo de pizzas:
-```text
-https://desafiolatam.sinapsolabs.cl/react_04_backend/api/pizzas
-```
-Detalle dinámico de una pizza:
-```text
-https://desafiolatam.sinapsolabs.cl/react_04_backend/api/pizzas/:id
-```
+Usuario de prueba
 
+Para probar el inicio de sesión:
+```text
+Email: test@test.com
+Contraseña: 123123
+```
