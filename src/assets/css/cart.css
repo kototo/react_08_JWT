@@ -1,0 +1,163 @@
+/* Fondo oscuro del carrito flotante */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px 16px 24px;
+}
+
+/* Caja principal del carrito flotante */
+.cart-modal {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Botón cerrar */
+.cart-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    border: none;
+    background: transparent;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* Contenedor interno del carrito */
+.cart-page {
+    padding: 20px 8px;
+    display: flex;
+    justify-content: center;
+}
+
+.cart-container {
+    width: 100%;
+    max-width: 620px;
+}
+
+.cart-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.cart-product {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 190px;
+}
+
+.cart-img {
+    width: 52px;
+    height: 36px;
+    object-fit: cover;
+}
+
+.cart-name {
+    font-weight: 700;
+}
+
+.cart-price {
+    font-weight: 700;
+    min-width: 90px;
+    text-align: right;
+}
+
+.cart-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cart-btn {
+    width: 34px;
+    height: 34px;
+}
+
+.cart-count {
+    font-weight: 700;
+}
+
+.cart-total {
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 28px;
+    margin-bottom: 20px;
+}
+
+
+
+/* Ajustes adicionales para el Hito 6 */
+
+/* Permite que los botones del carrito se acomoden mejor cuando agregamos eliminar */
+.cart-actions {
+    flex-wrap: wrap;
+}
+
+/* Mejora la visualización cuando el carrito está vacío */
+.cart-container .text-muted {
+    margin-bottom: 0;
+}
+
+/* Ajuste del botón eliminar dentro del carrito */
+.cart-actions .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+/* Mantiene el carrito flotante usable si el contenido crece */
+.cart-overlay {
+    overflow-y: auto;
+}
+
+/* Evita que el modal quede pegado al borde inferior en pantallas pequeñas */
+.cart-modal {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 576px) {
+    .cart-overlay {
+        padding-top: 70px;
+    }
+
+    .cart-modal {
+        padding: 22px 14px;
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 14px;
+    }
+
+    .cart-price {
+        text-align: left;
+    }
+
+    .cart-total {
+        font-size: 24px;
+    }
+}

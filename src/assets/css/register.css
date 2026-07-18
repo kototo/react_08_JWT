@@ -1,0 +1,31 @@
+/* Estilos mínimos para los formularios del Hito 2 */
+
+.form-page {
+    min-height: calc(100vh - 120px);
+    padding: 40px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 520px;
+}
+
+.form-title {
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Ajuste para celular */
+@media (max-width: 576px) {
+    .form-page {
+        padding: 24px 14px;
+    }
+
+    .form-title {
+        font-size: 28px;
+    }
+}

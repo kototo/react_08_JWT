@@ -1,0 +1,239 @@
+/* Estilos generales del proyecto */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f8f9fa;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Contenedor general para mantener el footer al final */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar-mamma {
+  width: 100%;
+  background-color: #212529;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.navbar-brand-area {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1;
+}
+
+/* Header con imagen de fondo.
+   La ruta apunta a src/assets/img/Header.jpg.
+   Puedes reemplazar ese archivo por la imagen original del apoyo del desafío. */
+.hero-header {
+  min-height: 220px;
+  padding: 2rem 1rem;
+  color: #ffffff;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.62)),
+    url('../img/Header.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hero-content h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.hero-content p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Sección de tarjetas */
+.pizza-section {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.cards-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* CardPizza */
+.pizza-card {
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pizza-img {
+  height: 210px;
+  object-fit: cover;
+}
+
+.pizza-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.pizza-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.ingredients-box {
+  text-align: center;
+}
+
+.ingredients-title {
+  margin-bottom: 0.35rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.ingredients-list {
+  margin: 0;
+  color: #555555;
+  font-size: 0.88rem;
+}
+
+.ingredients-list i {
+  color: #f0ad4e;
+}
+
+.pizza-price {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.pizza-buttons {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* Footer */
+.footer-mamma {
+  background-color: #212529;
+  color: #ffffff;
+  padding: 1rem;
+  text-align: center;
+}
+
+.footer-mamma p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Media query para computadores */
+@media (min-width: 992px) {
+  .hero-header {
+    min-height: 260px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.6rem;
+  }
+
+  .pizza-card {
+    flex: 1 1 300px;
+  }
+}
+
+/* Media query para celulares */
+@media (max-width: 576px) {
+  .navbar-mamma {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .navbar-brand-area {
+    justify-content: center;
+  }
+
+  .navbar-actions {
+    justify-content: center;
+  }
+
+  .navbar-actions .btn {
+    flex: 1 1 120px;
+  }
+
+  .hero-header {
+    min-height: 190px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.7rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .pizza-section {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .pizza-buttons {
+    flex-direction: column;
+  }
+}
